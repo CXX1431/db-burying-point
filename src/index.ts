@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import pageAccess from './modules/pageAccess';
+import interfaceRequest from './modules/interfaceRequest';
 import { DEVICE_INFO, restFulParam } from './util';
 import { def } from './types';
 
@@ -9,7 +10,7 @@ export class DbBuryingPoint {
   /** 埋点信息的发送函数，若有自定义的发送函数，则不需要使用上报地址了 */
   public reporter ?: (data: def.commonInfo.ICommonConfig) => void = null;
   /** 埋点监听器 */
-  public watchers = { pageAccess };
+  public watchers = { pageAccess, interfaceRequest };
   /** 埋点配置 */
   public config: def.modules.index.IConfig = {
     pageAccess: true,

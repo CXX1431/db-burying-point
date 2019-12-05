@@ -13,12 +13,12 @@ export default function(callback?: def.fn.IEventCallback, config?: def.modules.i
 
   function sendResult(){
     const result: def.commonInfo.ICommonConfig = {
-      time: Date.now(),
-      buryingPointType: 'pageAccess',
+      reporterTime: Date.now(),
+      buryingPointType: buryingPointType.pageAccess,
       browserName: DEVICE_INFO.browserName,
       browserVersion: DEVICE_INFO.browserVersion,
       deviceName: DEVICE_INFO.deviceName,
-      url: window.location.href,
+      pageUrl: window.location.href,
     };
     callback && callback(result);
   }

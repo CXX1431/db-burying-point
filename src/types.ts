@@ -34,30 +34,31 @@ export declare namespace def {
     /** 埋点信息的通用参数 */
     export type ICommonConfig = {
       /** 访问时间/请求时间/用户操作触发时间 */
-      time: string | number;
+      reporterTime: string | number;
       /** 设备名 */
       deviceName: string;
       /** 浏览器名 */
       browserName: string;
       /** 浏览器版本 */
       browserVersion: string;
-      /** ip地址 */
-      ipConfig?: string;
       /** 用户标识码, 若用户传入该id好，则优先使用用户的，若没有则使用自动生成的 */
       userId?: string;
       /** 埋点类型,页面访问|接口请求|用户操作 */
-      buryingPointType: 'pageAccess' | 'interfaceRequest' | 'userOperation';
+      buryingPointType: IBuryingPointType;
       /** 页面路径/接口url */
-      url?: string;
-      /** 页面或操作的对应标识,若无对应，则为 url */
-      desc?: string;
-      /** 请求类型 */
+      pageUrl?: string;
+      /** 请求路径 */
+      requestUrl?: string;
+      /** 请求类型, GET/POST */
       requestType?: string;
       /** 请求参数 JSON.stringify处理参数 */
       requestParams?: string;
       /** 请求code */
       requestCode?: number;
-      /** 捕获的信息,或者数据 JSON.stringify处理 */
+      /** 若请求存在错误，则记录错误类型和错误信息 */
+      errorType?: string;
+      errorMessage?: string;
+      /** 捕获的信息,或者数据 JSON.stringify处理,目前还未用到 */
       value?: string;
     };
   }
@@ -98,6 +99,24 @@ export declare namespace def {
         config?: IConfig,
         reporter?: string | reportCfg
       }
+    }
+    /** 接口请求模块下的类型定义 */
+    export namespace request {
+      /** 配置event的detail */
+      export interface IEventWithDetail<T> extends Event {
+        detail: T;
+      }
+      /** 事件记录项 */
+      export type ITimeRecord = {
+        /** 时间戳 */
+        timestamp: number | string;
+        /** 事件对象 */
+        event: IEventWithDetail<XMLHttpRequest>;
+        /** 当前url */
+        pageUrl: string;
+        /** 是否上传完毕 */
+        uploadFlag: boolean;
+      };
     }
   }
 

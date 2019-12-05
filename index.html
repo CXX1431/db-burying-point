@@ -15,7 +15,8 @@
               return {...data,test:'cxx'}
             },
             shouldReport: true
-          }
+          },
+          interfaceRequest: true
         },
         // reporter:'test-cxx'
         reporter: (data)=>{
@@ -27,6 +28,9 @@
     <title>Document</title>
   </head>
   <body>
-  
+    <script>
+      fetch('index.js');
+      fetch('test-css-fetch');
+    </script>
   </body>
 </html>

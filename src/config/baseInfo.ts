@@ -8,3 +8,9 @@ export const buryingPointType: { [propName: string]: def.commonInfo.IBuryingPoin
   /** 用户操作 */
   userOperation: 'userOperation',
 };
+
+export const ajaxEventType = {
+  ajaxLoadStart: 'ajaxLoadStart',
+  ajaxLoadEnd: 'ajaxLoadEnd',
+  ajaxLoadError: 'ajaxLoadError'
+};
