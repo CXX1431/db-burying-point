@@ -1,0 +1,30 @@
+{
+  "name": "db-burying-point",
+  "version": "0.2.0",
+  "description": "监控前端错误及请求",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "set NODE_ENV=development&&webpack-dev-server --open",
+    "build": "(rd /s /q dist || rm -rf ./dist || webpack) && webpack",
+    "commit": "git add . && git commit -m \"auto commit with shell\" && ( ( git pull && git push && echo \"提交成功\" )|| ( git reset HEAD && echo \"pull错误，已重置\" ) )",
+    "pub": "dbees-pub pub",
+    "postpub": "npm publish"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "dbees-pub": "^1.4.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
+  },
+  "typings": "index.d.ts",
+  "dependencies": {
+    "@types/lodash": "^4.14.149",
+    "lodash": "^4.17.15"
+  }
+}
