@@ -81,7 +81,10 @@ export declare namespace def {
          * browserRouter 为BrowserRouter的单页面应用 */
         type: 'normal' | 'hashRouter' | 'browserRouter'
       }
-      export interface IInterfaceRequest extends IDefaultCfg {}
+      export interface IInterfaceRequest extends IDefaultCfg {
+        /** 接口请求 url 配置,若为空数组，则不拦截任何请求，若为非空数组，则拦截包含其中请求路径的请求 */
+        url?: string[]
+      }
       export interface IUserOperation extends IDefaultCfg {}
       /** 埋点信息上传自定义方式 */
       export type reportCfg = (data: commonInfo.ICommonConfig) => void;

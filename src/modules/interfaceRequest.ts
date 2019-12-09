@@ -7,8 +7,9 @@ import * as _ from 'lodash';
 import { DEVICE_INFO } from '../util';
 import { def } from '../types';
 import { ajaxEventType, buryingPointType } from '../config/baseInfo';
+import { url } from 'inspector';
 
-export default function(callback?: def.fn.IEventCallback, config?:any) {
+export default function(callback?: def.fn.IEventCallback, config?:def.modules.index.IInterfaceRequest) {
   const oldXHR = XMLHttpRequest;
   /** 时间事件数据记录 */
   let timeRecordArray: def.modules.request.ITimeRecord[] = [];
@@ -47,17 +48,35 @@ export default function(callback?: def.fn.IEventCallback, config?:any) {
     return realXHR;
   }
 
+  function isUrlValid(requestUrl: string, config: def.modules.index.IInterfaceRequest){
+     /** 若config为undefind则全埋点，或url为非空数组，拦截其中的路径，若存在不正确的 url数组，则不埋点 */
+    if(!config){
+      return true;
+    } else {
+      const urlList = _.get(config, 'url');
+      let isValid = false;
+      const isUrlListValid = urlList && _.isArray(urlList) && !_.isEmpty(urlList);
+      if(isUrlListValid){
+        urlList.forEach( (url: string) =>{
+          if(requestUrl.indexOf(url) > -1){
+            isValid = true;
+          }
+        });
+      } 
+      return isValid;
+    }
+  }
+
   function handleHttpResult(timeRecord: def.modules.request.ITimeRecord){
     const result: def.commonInfo.ICommonConfig = {
-      /** 待完善需传送的信息属性 */
       reporterTime: timeRecord.timestamp,
       buryingPointType: buryingPointType.interfaceRequest,
       browserName: DEVICE_INFO.browserName,
       browserVersion: DEVICE_INFO.browserVersion,
       deviceName: DEVICE_INFO.deviceName,
       requestType: (timeRecord as any).event.detail.requestMethod,
-      pageUrl: timeRecord.event.detail.responseURL,
-      requestUrl:(timeRecord as any).event.detail.requestUrl,
+      pageUrl: timeRecord.pageUrl,
+      requestUrl:(timeRecord as any).event.detail.responseURL,
       requestParams: (timeRecord as any).event.detail.requestParams,
       requestCode: (timeRecord as any).event.detail.status,
       errorType: (timeRecord as any).event.detail.status === 200
@@ -68,19 +87,20 @@ export default function(callback?: def.fn.IEventCallback, config?:any) {
       : (timeRecord as any).event.detail.statusText,
     };
 
-    callback && callback(this);
+    callback && callback(result);
   }
 
   (window as any).XMLHttpRequest = newXHR;
   window.addEventListener(ajaxEventType.ajaxLoadStart, function(
     e: def.modules.request.IEventWithDetail<XMLHttpRequest>
   ) {
-    timeRecordArray.push({
-      timestamp: Date.now(),
-      event: e,
-      pageUrl: window.location.href,
-      uploadFlag: false
-    });
+      timeRecordArray.push({
+        timestamp: Date.now(),
+        event: e,
+        pageUrl: window.location.href,
+        uploadFlag: false
+      });
+    // }
   });
   window.addEventListener(ajaxEventType.ajaxLoadEnd, function() {
     timeRecordArray.forEach(timeRecord => {
@@ -90,7 +110,10 @@ export default function(callback?: def.fn.IEventCallback, config?:any) {
       }
       if(timeRecord.event.detail.status > 0) {
         timeRecord.uploadFlag = true;
-        handleHttpResult(timeRecord);
+        const requestUrl = timeRecord.event.detail.responseURL;
+        if(isUrlValid(requestUrl, config)){
+          handleHttpResult(timeRecord);
+        }
       }
     });
     /** 清除已经处理的数据 */
@@ -104,6 +127,9 @@ export default function(callback?: def.fn.IEventCallback, config?:any) {
       input: RequestInfo,
       init?: RequestInit
     ): Promise<Response>{
+      // if(!_.isString(input)){
+      //   input.
+      // }
       let opt: RequestInit = _.isString(input)? init: input;
       let requestUrl = _.isString(input)? input: input.url;
       const result: def.commonInfo.ICommonConfig = {
@@ -124,15 +150,19 @@ export default function(callback?: def.fn.IEventCallback, config?:any) {
             result.requestCode = res.status;
             result.errorType = res.status === 200? '': 'TypeError: ' + res.statusText;
             result.errorMessage = res.status === 200? '': res.statusText;
-            callback && callback(result);
+            if(isUrlValid(_.get(result,'requestUrl'),config)){
+              callback && callback(result);
+            }
             resolve(res);
           })
           .catch(e => {
-            window.console.log('e', e);
-            // result.requestCode = res.status;
-            // result.errorType = res.status === 200? '': 'TypeError: ' + res.statusText;
-            // result.errorMessage = res.status === 200? '': res.statusText;
-            callback && callback(result);
+            result.requestCode = 404;
+            result.errorType = e.stack;
+            result.errorMessage = e.message;
+            // callback && callback(result);
+            if(isUrlValid(_.get(result,'requestUrl'),config)){
+              callback && callback(result);
+            }
             reject(e);
           });
       });

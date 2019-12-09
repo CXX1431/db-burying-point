@@ -16,7 +16,11 @@
             },
             shouldReport: true
           },
-          interfaceRequest: true
+          // interfaceRequest: true
+          interfaceRequest:{
+            url:['css']
+            // url:''
+          }
         },
         // reporter:'test-cxx'
         reporter: (data)=>{
@@ -31,6 +35,12 @@
     <script>
       fetch('index.js');
       fetch('test-css-fetch');
+      // const xhr=new XMLHttpRequest();
+      // xhr.open('GET','index.js')
+      // xhr.send(null);
+      // const xhr=new XMLHttpRequest();
+      // xhr.open('GET','index1.js')
+      // xhr.send(null);
     </script>
   </body>
 </html>

@@ -52,7 +52,7 @@ export class DbBuryingPoint {
   /** 接收器 */
   public recordReceiver = (data: def.commonInfo.ICommonConfig) => {
     let dt = data;
-    if(!_.isBoolean(this.config) && !_.isEmpty(this.config[data.buryingPointType])){
+    if(!_.isBoolean(this.config) && !_.isEmpty(_.get(this.config,'data.buryingPointType'))){
       const config:any = this.config[data.buryingPointType];
       const shouldReported: boolean = _.get(config,'shouldReport', true);
       if(!shouldReported){
