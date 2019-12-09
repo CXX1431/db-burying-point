@@ -60,6 +60,13 @@ export declare namespace def {
       errorMessage?: string;
       /** 捕获的信息,或者数据 JSON.stringify处理,目前还未用到 */
       value?: string;
+      /** 用户操作得到的信息 */
+      /** 目标对象的className */
+      className?: string;
+      placeholder?: string;
+      inputValue?: string;
+      tagName?: string;
+      innerText?: string;
     };
   }
 
