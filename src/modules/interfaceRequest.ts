@@ -127,9 +127,6 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
       input: RequestInfo,
       init?: RequestInit
     ): Promise<Response>{
-      // if(!_.isString(input)){
-      //   input.
-      // }
       let opt: RequestInit = _.isString(input)? init: input;
       let requestUrl = _.isString(input)? input: input.url;
       const result: def.commonInfo.ICommonConfig = {
@@ -159,7 +156,6 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
             result.requestCode = 404;
             result.errorType = e.stack;
             result.errorMessage = e.message;
-            // callback && callback(result);
             if(isUrlValid(_.get(result,'requestUrl'),config)){
               callback && callback(result);
             }
