@@ -9,25 +9,25 @@
     <script>
       const buryPointCtf = {
         config: {
-          pageAccess:{
-            type:'browserRouter',
-            filter(data){
-              return {...data,test:'cxx'}
+          pageAccess: {
+            type: "browserRouter",
+            filter(data) {
+              return { ...data, test: "cxx" };
             },
             shouldReport: true
           },
           // interfaceRequest: true
-          interfaceRequest:{
-            url:['css']
+          interfaceRequest: {
+            url: ["css"]
             // url:''
           },
           userOperation: true
         },
         // reporter:'test-cxx'
-        reporter: (data)=>{
-          window.console.log('自定义上报方法', data);
+        reporter: data => {
+          window.console.log("自定义上报方法", data);
         }
-      }
+      };
       const test = new DbBuryingPoint(buryPointCtf);
     </script>
     <title>Document</title>
@@ -35,8 +35,8 @@
   <body>
     <button>click me</button>
     <script>
-      fetch('index.js');
-      fetch('test-css-fetch');
+      fetch("/index.js");
+      fetch("http://localhost:3000/test-css-fetch");
       // const xhr=new XMLHttpRequest();
       // xhr.open('GET','index.js')
       // xhr.send(null);

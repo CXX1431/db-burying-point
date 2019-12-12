@@ -12,7 +12,7 @@
     "postpub": "npm publish"
   },
   "keywords": [],
-  "author": "",
+  "author": "CXX1431",
   "license": "ISC",
   "devDependencies": {
     "dbees-pub": "^1.4.0",

@@ -6,10 +6,9 @@ import { def } from '../types';
 export default function(callback?: def.fn.IEventCallback, config?: def.modules.index.IUserOperation){
   // 记录用户点击元素的行为数据
   document.onclick = function (e) {
-    window.console.log('eeeee', e, _.get(e, 'path'));
     const result: def.commonInfo.ICommonConfig = {
       reporterTime: Date.now(),
-      buryingPointType: buryingPointType.pageAccess,
+      buryingPointType: buryingPointType.userOperation,
       browserName: DEVICE_INFO.browserName,
       browserVersion: DEVICE_INFO.browserVersion,
       deviceName: DEVICE_INFO.deviceName,
@@ -32,6 +31,7 @@ export default function(callback?: def.fn.IEventCallback, config?: def.modules.i
       }
       result.innerText = result.innerText.replace(/\s/g, '');
     }
+
     callback && callback(result);
   }
 }

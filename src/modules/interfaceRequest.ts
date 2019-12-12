@@ -3,13 +3,15 @@
  * 2.若配置为 true,则所有接口全监听
  * 3.若为非空数组，则监听包含数组中请求路径的接口
  */
-import * as _ from 'lodash';
-import { DEVICE_INFO } from '../util';
-import { def } from '../types';
-import { ajaxEventType, buryingPointType } from '../config/baseInfo';
-import { url } from 'inspector';
+import * as _ from "lodash";
+import { DEVICE_INFO } from "../util";
+import { def } from "../types";
+import { ajaxEventType, buryingPointType } from "../config/baseInfo";
 
-export default function(callback?: def.fn.IEventCallback, config?:def.modules.index.IInterfaceRequest) {
+export default function(
+  callback?: def.fn.IEventCallback,
+  config?: def.modules.index.IInterfaceRequest
+) {
   const oldXHR = XMLHttpRequest;
   /** 时间事件数据记录 */
   let timeRecordArray: def.modules.request.ITimeRecord[] = [];
@@ -22,10 +24,10 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
       oldOpen.call(this, ...args);
     };
     const oldSend = realXHR.send;
-    realXHR.send = function(body){
-      this.requestParams = body? body.toString : '';
+    realXHR.send = function(body) {
+      this.requestParams = body ? body.toString : "";
       oldSend.call(realXHR, body);
-    }
+    };
     realXHR.onloadstart = function() {
       const startEvent = new CustomEvent(ajaxEventType.ajaxLoadStart, {
         /** 如果用箭头函数，这个this就需要具名指向realXHR */
@@ -33,14 +35,14 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
       });
       window.dispatchEvent(startEvent);
     };
-    realXHR.onloadend = function(){
+    realXHR.onloadend = function() {
       const endEvent = new CustomEvent(ajaxEventType.ajaxLoadEnd, {
         detail: this
       });
       window.dispatchEvent(endEvent);
     };
     realXHR.onerror = function() {
-      const errEvent = new CustomEvent(ajaxEventType.ajaxLoadError,{
+      const errEvent = new CustomEvent(ajaxEventType.ajaxLoadError, {
         detail: this
       });
       window.dispatchEvent(errEvent);
@@ -48,26 +50,30 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
     return realXHR;
   }
 
-  function isUrlValid(requestUrl: string, config: def.modules.index.IInterfaceRequest){
-     /** 若config为undefind则全埋点，或url为非空数组，拦截其中的路径，若存在不正确的 url数组，则不埋点 */
-    if(!config){
-      return true;
+  function isUrlValid(
+    reqUrl: string,
+    config: def.modules.index.IInterfaceRequest
+  ) {
+    /** 若config为undefind或false不埋点，或url为非空数组，拦截其中的路径，若存在不正确的 url数组，则不埋点 */
+    if (!config) {
+      return false;
     } else {
-      const urlList = _.get(config, 'url');
+      const requestUrl = _.get(reqUrl.split("?"), "[0]", "");
+      const urlList = _.get(config, "url", []);
       let isValid = false;
-      const isUrlListValid = urlList && _.isArray(urlList) && !_.isEmpty(urlList);
-      if(isUrlListValid){
-        urlList.forEach( (url: string) =>{
-          if(requestUrl.indexOf(url) > -1){
+      const isUrlListValid = _.isArray(urlList) && !_.isEmpty(urlList);
+      if (isUrlListValid) {
+        urlList.forEach((url: string) => {
+          if (requestUrl.indexOf(url) > -1) {
             isValid = true;
           }
         });
-      } 
+      }
       return isValid;
     }
   }
 
-  function handleHttpResult(timeRecord: def.modules.request.ITimeRecord){
+  function handleHttpResult(timeRecord: def.modules.request.ITimeRecord) {
     const result: def.commonInfo.ICommonConfig = {
       reporterTime: timeRecord.timestamp,
       buryingPointType: buryingPointType.interfaceRequest,
@@ -76,15 +82,17 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
       deviceName: DEVICE_INFO.deviceName,
       requestType: (timeRecord as any).event.detail.requestMethod,
       pageUrl: timeRecord.pageUrl,
-      requestUrl:(timeRecord as any).event.detail.responseURL,
+      requestUrl: (timeRecord as any).event.detail.responseURL,
       requestParams: (timeRecord as any).event.detail.requestParams,
       requestCode: (timeRecord as any).event.detail.status,
-      errorType: (timeRecord as any).event.detail.status === 200
-        ? ''
-        : 'TypeError: ' + (timeRecord as any).event.detail.statusText,
-      errorMessage: (timeRecord as any).event.detail.status === 200
-      ? ''
-      : (timeRecord as any).event.detail.statusText,
+      errorType:
+        (timeRecord as any).event.detail.status === 200
+          ? ""
+          : "TypeError: " + (timeRecord as any).event.detail.statusText,
+      errorMessage:
+        (timeRecord as any).event.detail.status === 200
+          ? ""
+          : (timeRecord as any).event.detail.statusText
     };
 
     callback && callback(result);
@@ -94,24 +102,23 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
   window.addEventListener(ajaxEventType.ajaxLoadStart, function(
     e: def.modules.request.IEventWithDetail<XMLHttpRequest>
   ) {
-      timeRecordArray.push({
-        timestamp: Date.now(),
-        event: e,
-        pageUrl: window.location.href,
-        uploadFlag: false
-      });
-    // }
+    timeRecordArray.push({
+      timestamp: Date.now(),
+      event: e,
+      pageUrl: window.location.href,
+      uploadFlag: false
+    });
   });
   window.addEventListener(ajaxEventType.ajaxLoadEnd, function() {
     timeRecordArray.forEach(timeRecord => {
       /**如果uploadFlag为true，代表已经上传过了  */
-      if(timeRecord.uploadFlag) {
-        return ;
+      if (timeRecord.uploadFlag) {
+        return;
       }
-      if(timeRecord.event.detail.status > 0) {
+      if (timeRecord.event.detail.status > 0) {
         timeRecord.uploadFlag = true;
         const requestUrl = timeRecord.event.detail.responseURL;
-        if(isUrlValid(requestUrl, config)){
+        if (isUrlValid(requestUrl, config)) {
           handleHttpResult(timeRecord);
         }
       }
@@ -121,14 +128,14 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
   });
 
   /** 处理fetch请求 */
-  if('fetch' in window) {
+  if ("fetch" in window) {
     const oldFetch = window.fetch;
     window.fetch = function(
       input: RequestInfo,
       init?: RequestInit
-    ): Promise<Response>{
-      let opt: RequestInit = _.isString(input)? init: input;
-      let requestUrl = _.isString(input)? input: input.url;
+    ): Promise<Response> {
+      let opt: RequestInit = _.isString(input) ? init : input;
+      let requestUrl = _.isString(input) ? input : input.url;
       const result: def.commonInfo.ICommonConfig = {
         /** 待完善需传送的信息属性 */
         reporterTime: Date.now(),
@@ -138,16 +145,17 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
         deviceName: DEVICE_INFO.deviceName,
         pageUrl: window.location.href,
         requestUrl,
-        requestType: _.get(opt, 'method', 'GET'),
-        requestParams: _.get(opt, 'body', '').toString()
+        requestType: _.get(opt, "method", "GET"),
+        requestParams: _.get(opt, "body", "").toString()
       };
       return new Promise(function(resolve, reject) {
         return oldFetch(input, init)
           .then(res => {
             result.requestCode = res.status;
-            result.errorType = res.status === 200? '': 'TypeError: ' + res.statusText;
-            result.errorMessage = res.status === 200? '': res.statusText;
-            if(isUrlValid(_.get(result,'requestUrl'),config)){
+            result.errorType =
+              res.status === 200 ? "" : "TypeError: " + res.statusText;
+            result.errorMessage = res.status === 200 ? "" : res.statusText;
+            if (isUrlValid(_.get(result, "requestUrl"), config)) {
               callback && callback(result);
             }
             resolve(res);
@@ -156,7 +164,7 @@ export default function(callback?: def.fn.IEventCallback, config?:def.modules.in
             result.requestCode = 404;
             result.errorType = e.stack;
             result.errorMessage = e.message;
-            if(isUrlValid(_.get(result,'requestUrl'),config)){
+            if (isUrlValid(_.get(result, "requestUrl"), config)) {
               callback && callback(result);
             }
             reject(e);

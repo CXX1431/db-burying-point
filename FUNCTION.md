@@ -44,6 +44,6 @@ interface ICommonRes {
   /** 请求code */
   requestCode?: number;
   /** 捕获的信息,或者数据 JSON.stringify处理 */
-  value: string;
+  reportValue: string;
 }
 ```

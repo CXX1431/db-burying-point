@@ -29,7 +29,6 @@ export default function(callback?: def.fn.IEventCallback, config?: def.modules.i
     'load',
     function(e) {
       if(_.get(e,'target') && _.get(e,'target.readyState') === 'complete'){
-          window.console.log('loading', e);
           let oldUrl = window.location.href;
           this.sessionStorage.setItem('oldUrl', oldUrl);
           sendResult();
@@ -38,13 +37,11 @@ export default function(callback?: def.fn.IEventCallback, config?: def.modules.i
     true
   );
 
-  window.console.log('config-type',_.get(config,'type'),_.get(config,'type') === 'hashRouter');
   if(_.get(config,'type') === 'hashRouter'){
     /** 监测单页面应用 hashrouter 的变化 */
     window.addEventListener(
       'hashchange',
       function(e) {
-        window.console.log('burying-hashchange',e);
         let oldUrl = window.location.href;
         this.sessionStorage.setItem('oldUrl', oldUrl);
         sendResult();
@@ -57,7 +54,6 @@ export default function(callback?: def.fn.IEventCallback, config?: def.modules.i
     window.addEventListener(
       'popstate',
       function(e) {
-        window.console.log('burying-popstate',e);
         let oldUrl = window.location.href;
         this.sessionStorage.setItem('oldUrl', oldUrl);
         sendResult();
@@ -82,13 +78,11 @@ export default function(callback?: def.fn.IEventCallback, config?: def.modules.i
     window.addEventListener('replaceState', function(e) {
       let oldUrl = window.location.href;
       this.sessionStorage.setItem('oldUrl', oldUrl);
-      console.log('replaceState',e);
       sendResult();
     });
     window.addEventListener('pushState', function(e) {
       let oldUrl = sessionStorage.getItem('oldUrl');
       let newUrl = window.location.href;
-      console.log('pushState',oldUrl,newUrl, e);
       if(newUrl !== oldUrl){
         sessionStorage.setItem('oldUrl', newUrl);
         sendResult();

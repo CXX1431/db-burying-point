@@ -29,7 +29,10 @@ export declare namespace def {
     };
 
     /** 埋点类型 */
-    export type IBuryingPointType = 'pageAccess' | 'interfaceRequest' | 'userOperation';
+    export type IBuryingPointType =
+      | "pageAccess"
+      | "interfaceRequest"
+      | "userOperation";
 
     /** 埋点信息的通用参数 */
     export type ICommonConfig = {
@@ -59,14 +62,14 @@ export declare namespace def {
       errorType?: string;
       errorMessage?: string;
       /** 捕获的信息,或者数据 JSON.stringify处理,目前还未用到 */
-      value?: string;
+      reportValue?: string;
       /** 用户操作得到的信息 */
       /** 目标对象的className */
       className?: string;
       placeholder?: string;
       inputValue?: string;
       tagName?: string;
-      innerText?: string; 
+      innerText?: string;
     };
   }
 
@@ -78,7 +81,7 @@ export declare namespace def {
       export type IDefaultCfg = {
         /** 受否上报该埋点信息 */
         filter?: (data: commonInfo.ICommonConfig) => commonInfo.ICommonConfig;
-        shouldReport?: boolean
+        shouldReport?: boolean;
       };
 
       export interface IPageAccess extends IDefaultCfg {
@@ -86,11 +89,11 @@ export declare namespace def {
          * normal:普通多页面形式，
          * hashrouter：采用Hashrouter的单页面应用，
          * browserRouter 为BrowserRouter的单页面应用 */
-        type: 'normal' | 'hashRouter' | 'browserRouter'
+        type: "normal" | "hashRouter" | "browserRouter";
       }
       export interface IInterfaceRequest extends IDefaultCfg {
-        /** 接口请求 url 配置,若为空数组，则不拦截任何请求，若为非空数组，则拦截包含其中请求路径的请求 */
-        url?: string[]
+        /** 接口请求 接口地址列表,若为空数组，则不拦截任何请求，若为非空数组，则拦截包含其中请求路径的请求 */
+        url?: string[];
       }
       export interface IUserOperation extends IDefaultCfg {}
       /** 埋点信息上传自定义方式 */
@@ -98,17 +101,18 @@ export declare namespace def {
       /** 配置格式 */
       export type IConfig = {
         /** 页面访问，若为true，默认监测 普通页面访问模式 */
-        pageAccess ?: boolean | IPageAccess;
+        pageAccess?: boolean | IPageAccess;
         /** 接口请求 */
-        interfaceRequest ?: boolean | IInterfaceRequest;
+        interfaceRequest?: boolean | IInterfaceRequest;
         /** 用户操作监控 */
-        userOperation ?: boolean | IUserOperation;
+        userOperation?: boolean | IUserOperation;
       };
       /** 埋点配置 */
       export type IBuryingPointCfg = {
-        config?: IConfig,
-        reporter?: string | reportCfg
-      }
+        config?: IConfig;
+        /** 上报地址或者上报函数 */
+        reporter?: string | reportCfg;
+      };
     }
     /** 接口请求模块下的类型定义 */
     export namespace request {
