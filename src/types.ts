@@ -66,7 +66,7 @@ export declare namespace def {
       placeholder?: string;
       inputValue?: string;
       tagName?: string;
-      innerText?: string;
+      innerText?: string; 
     };
   }
 

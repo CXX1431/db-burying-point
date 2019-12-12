@@ -32,7 +32,6 @@ export default function(callback?: def.fn.IEventCallback, config?: def.modules.i
       }
       result.innerText = result.innerText.replace(/\s/g, '');
     }
-
     callback && callback(result);
   }
 }
